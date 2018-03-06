@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-// import axios from 'axios';
-
 import { withRouter, Link } from 'react-router-dom';
 import AppBar from 'material-ui/AppBar';
 import MenuItem from 'material-ui/MenuItem';
@@ -14,7 +12,6 @@ import Paper from 'material-ui/Paper';
 import Home from 'material-ui/svg-icons/action/home';
 import Previous from 'material-ui/svg-icons/av/library-books';
 import Active from 'material-ui/svg-icons/action/assignment';
-import axios from 'axios';
 import 'material-design-icons';
 
 import Auth from './Auth';
@@ -42,13 +39,7 @@ class App extends Component {
     this.select = this.select.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
   }
-  componentDidMount() {
-    if (!this.state.user) {
-      axios.get('/api/user').then(response => {
-        this.setState({ user: response.data });
-      });
-    }
-  }
+
   handlePageRefresh() {
     this.setState({ ...this.state });
   }
@@ -96,7 +87,7 @@ class App extends Component {
               width: '100%',
               borderTop: '1px solid white'
             }}
-            onClick={logout}
+            onClick={() => null}
             primaryText="Logout"
           />
         </Drawer>
@@ -135,7 +126,6 @@ class App extends Component {
 
 export default withRouter(App);
 
-function logout() {}
 function login() {
-  auth.login();
+  window.location.href = `${process.env.REACT_APP_HOST}/login`;
 }

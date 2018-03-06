@@ -4,7 +4,9 @@ const express = require('express'),
   port = 3001,
   app = express(),
   session = require('express-session'),
-  massive = require('massive');
+  massive = require('massive'),
+  passport = require('passport'),
+  Auth0Strategy = require('passport-auth0');
 require('dotenv').config();
 
 massive(process.env.CONNECTION_STRING)
@@ -23,6 +25,40 @@ app.use(
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/', express.static(__dirname));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+  new Auth0Strategy(
+    {
+      domain: process.env.DOMAIN,
+      clientID: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      callbackURL: '/callback',
+      scope: 'openid profile'
+    },
+    (accessToken, refreshToken, extraParams, profile, done) => {
+      console.log('profile: ', profile);
+      return done(null, profile);
+    }
+  )
+);
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
+app.get(
+  '/callback',
+  passport.authenticate('auth0', { failureRedirect: '/login' }),
+  (req, res) => {
+    if (!req.user) {
+      throw new Error('user null');
+    }
+    /** This is where we can add user to db, or redirect to the front end */
+    res.redirect(process.env.FRONT_END_URL);
+  }
+);
+
+// redirects to googleAuth
+app.get('/login', passport.authenticate('auth0', {}));
 
 // //////////// API'S ////////////////
 
