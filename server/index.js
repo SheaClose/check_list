@@ -89,6 +89,13 @@ app.get('/api/logout', (req, res) => {
   req.session.destroy();
   res.status(200).json('logged out');
 });
+app.get('/api/checklists', (req, res) => {
+  req.app
+    .get('db')
+    .checklists.find()
+    .then(checklists => res.status(200).json(checklists))
+    .catch(err => console.log('Unable to fetch checklists: ', err));
+});
 
 app.listen(port, () => {
   // console.log('Server listening on port', port);

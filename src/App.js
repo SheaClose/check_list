@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import AppBar from 'material-ui/AppBar';
 import MenuItem from 'material-ui/MenuItem';
 import Drawer from 'material-ui/Drawer';
-import Avatar from 'material-ui/Avatar';
+import IconButton from 'material-ui/IconButton';
 import {
   BottomNavigation,
   BottomNavigationItem
@@ -13,14 +14,12 @@ import Paper from 'material-ui/Paper';
 import Home from 'material-ui/svg-icons/action/home';
 import Previous from 'material-ui/svg-icons/av/library-books';
 import Active from 'material-ui/svg-icons/action/assignment';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import 'material-design-icons';
 
-import Auth from './Auth';
 import Routes from './Components/Routes';
 
 import './App.css';
-
-const auth = new Auth();
 
 const bottomNav = {
   position: 'absolute',
@@ -47,14 +46,21 @@ class App extends Component {
       }
       this.setState({ loading: false });
     });
+    axios
+      .get('/api/checklists')
+      .then(({ data: checklists }) => {
+        this.setState({ checklists });
+      })
+      .catch(console.log);
   }
 
   handlePageRefresh() {
     this.setState({ ...this.state, open: false });
   }
 
-  select(index) {
+  select(index, path) {
     this.setState({ selectedIndex: index });
+    this.goTo(path);
   }
 
   handleToggle() {
@@ -68,8 +74,11 @@ class App extends Component {
     });
   }
 
+  goTo(path) {
+    this.props.history.push(path);
+  }
   render() {
-    const { loggedIn, loading } = this.state;
+    const { loggedIn, loading, checklists } = this.state;
     return (
       <div className="App">
         <AppBar
@@ -77,8 +86,10 @@ class App extends Component {
           showMenuIconButton={false}
           iconElementRight={
             <div onClick={() => this.setState({ open: true })}>
-              {this.state.user && (
-                <Avatar src={this.state.user.img_url} size={50} />
+              {loggedIn && (
+                <IconButton>
+                  <MoreVertIcon />
+                </IconButton>
               )}
             </div>
           }
@@ -89,9 +100,13 @@ class App extends Component {
           open={this.state.open}
           onRequestChange={open => this.setState({ open })}
         >
-          <Link onClick={this.handleToggle} to="/newChecklist">
-            <MenuItem primaryText="New Checklist" />
-          </Link>
+          <MenuItem
+            onClick={() => {
+              this.goTo('/newChecklist');
+              this.handleToggle();
+            }}
+            primaryText="New Checklist"
+          />
           <MenuItem primaryText="Refresh" onClick={this.handlePageRefresh} />
           <MenuItem
             style={{
@@ -108,7 +123,7 @@ class App extends Component {
         <Routes
           login={login}
           loggedIn={loggedIn}
-          auth={auth}
+          checklists={checklists}
           loading={loading}
         />
         <Paper style={{ overflow: 'hidden' }} zDepth={1}>
@@ -119,17 +134,17 @@ class App extends Component {
             <BottomNavigationItem
               label="Home"
               icon={<Home />}
-              onClick={() => this.select(0)}
+              onClick={() => this.select(0, '/')}
             />
             <BottomNavigationItem
               label="Active"
               icon={<Active />}
-              onClick={() => this.select(1)}
+              onClick={() => this.select(1, '/Active')}
             />
             <BottomNavigationItem
               label="Previous"
               icon={<Previous />}
-              onClick={() => this.select(2)}
+              onClick={() => this.select(2, '/Previous')}
             />
           </BottomNavigation>
         </Paper>
@@ -137,6 +152,10 @@ class App extends Component {
     );
   }
 }
+
+App.propTypes = {
+  history: PropTypes.object
+};
 
 export default withRouter(App);
 
