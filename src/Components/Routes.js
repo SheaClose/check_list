@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import RaisedButton from 'material-ui/RaisedButton';
-import Callback from './Callback';
+// import Callback from './Callback';
 import Home from './Home';
 // import './Routes.css';
 
@@ -23,13 +23,6 @@ class Routes extends Component {
     const { loggedIn } = this.state;
     return (
       <Switch>
-        <Route
-          path="/callback"
-          render={props => (
-            <Callback {...Object.assign({}, { ...this.props }, { ...props })} />
-          )}
-        />
-
         {/* Protected Routes */}
         {loggedIn && (
           <Switch>
@@ -44,19 +37,24 @@ class Routes extends Component {
         {/* If not logged in */}
         <Route
           path="/"
-          render={() => (
-            <RaisedButton
-              onClick={this.props.login}
-              style={{
-                position: 'absolute',
-                bottom: '50%',
-                left: '50%',
-                transform: 'translate(-50%)'
-              }}
-              label="Log In"
-              secondary={true}
-            />
-          )}
+          render={() => {
+            const style = {
+              position: 'absolute',
+              bottom: '50%',
+              left: '50%',
+              transform: 'translate(-50%)'
+            };
+            return this.props.loading ? (
+              <div style={style}>Loading...</div>
+            ) : (
+              <RaisedButton
+                onClick={this.props.login}
+                style={style}
+                label="Log In"
+                secondary={true}
+              />
+            );
+          }}
         />
       </Switch>
     );
@@ -65,7 +63,8 @@ class Routes extends Component {
 
 Routes.propTypes = {
   loggedIn: PropTypes.bool,
-  login: PropTypes.func
+  login: PropTypes.func,
+  loading: PropTypes.bool
 };
 
 export default withRouter(Routes);

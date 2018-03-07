@@ -6,7 +6,7 @@ const express = require('express'),
   session = require('express-session'),
   massive = require('massive'),
   passport = require('passport'),
-  Auth0Strategy = require('passport-auth0');
+  GoogleStrategy = require('passport-google-oauth20').Strategy;
 require('dotenv').config();
 
 massive(process.env.CONNECTION_STRING)
@@ -28,69 +28,68 @@ app.use('/', express.static(__dirname));
 app.use(passport.initialize());
 app.use(passport.session());
 
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
+
 passport.use(
-  new Auth0Strategy(
+  new GoogleStrategy(
     {
-      domain: process.env.DOMAIN,
-      clientID: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: '/callback',
       scope: 'openid profile'
     },
-    (accessToken, refreshToken, extraParams, profile, done) => {
-      console.log('profile: ', profile);
-      return done(null, profile);
-    }
+    (accessToken, refreshToken, profile, cb) => cb(null, profile)
   )
 );
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
+
 app.get(
   '/callback',
-  passport.authenticate('auth0', { failureRedirect: '/login' }),
+  passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    if (!req.user) {
-      throw new Error('user null');
-    }
-    /** This is where we can add user to db, or redirect to the front end */
-    res.redirect(process.env.FRONT_END_URL);
+    const userPhoto = req.user.photos[0].value.split('?')[0];
+    const user = {
+      id: req.user.id,
+      name: req.user.displayName,
+      first_name: req.user.name.givenName,
+      last_name: req.user.name.familyName,
+      img_url: userPhoto
+    };
+    const db = req.app.get('db');
+    db
+      .run('select * from checklist_users where id = $1', user.id)
+      .then(existingUser => {
+        if (!existingUser.length) {
+          db
+            .run(
+              // eslint-disable-next-line
+              'insert into checklist_users (id, name, first_name, last_name, img_url) values (${id}, ${name}, ${first_name}, ${last_name}, ${img_url}); select * from checklist_users where id = ${id}',
+              user
+            )
+            .then(newUser => {
+              req.session.user = newUser[0];
+              return res.redirect(process.env.FRONT_END_URL);
+            })
+            .catch(err => console.log('Unable to create new user: ', err));
+        } else {
+          req.session.user = existingUser[0];
+          res.redirect(process.env.FRONT_END_URL);
+        }
+      })
+      .catch(err => console.log('Error retrieving user from database: ', err));
   }
 );
 
 // redirects to googleAuth
-app.get('/login', passport.authenticate('auth0', {}));
-
+app.get('/login', passport.authenticate('google'));
 // //////////// API'S ////////////////
 
-app.post('/api/postUser', (req, res) => {
-  const { user } = req.body;
-  const userObj = {
-    name: user.name,
-    first_name: user.given_name,
-    last_name: user.family_name,
-    img_url: user.picture,
-    id: user.sub
-  };
-  const db = req.app.get('db');
-  db.checklist_users
-    .find({ id: userObj.id })
-    .then(dbUser => {
-      if (!dbUser.length) {
-        db.checklist_users.insert(userObj).then(newDbUser => {
-          req.session.user = newDbUser;
-          return res.status(200).json(req.session.user);
-        });
-      } else {
-        return res.status(200).json(...dbUser);
-      }
-      return null;
-    })
-    .catch(err => console.log('cannot find user: ', err));
-  //
+app.get('/api/user', (req, res) => res.status(200).json(req.session.user));
+app.get('/api/logout', (req, res) => {
+  req.session.destroy();
+  res.status(200).json('logged out');
 });
 
-app.get('/api/user', (req, res) => res.status(200).json(req.session.user));
-
 app.listen(port, () => {
-  console.log('Server listening on port', port);
+  // console.log('Server listening on port', port);
 });

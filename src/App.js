@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
+import axios from 'axios';
 import AppBar from 'material-ui/AppBar';
 import MenuItem from 'material-ui/MenuItem';
 import Drawer from 'material-ui/Drawer';
@@ -32,34 +33,47 @@ class App extends Component {
     super(props);
     this.state = {
       loggedIn: false,
-      open: false
+      open: false,
+      loading: true
     };
-    this.updateUser = this.updateUser.bind(this);
     this.handlePageRefresh = this.handlePageRefresh.bind(this);
     this.select = this.select.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
   }
+  componentDidMount() {
+    axios.get('/api/user').then(res => {
+      if (res.data) {
+        this.setState({ loggedIn: true, user: res.data });
+      }
+      this.setState({ loading: false });
+    });
+  }
 
   handlePageRefresh() {
-    this.setState({ ...this.state });
+    this.setState({ ...this.state, open: false });
   }
 
-  updateUser(user) {
-    this.setState({ user, loggedIn: true });
-  }
   select(index) {
     this.setState({ selectedIndex: index });
   }
+
   handleToggle() {
     this.setState({ open: !this.state.open });
   }
 
+  logOut() {
+    this.setState({ loggedIn: false, user: null, open: false });
+    axios.get('/api/logout').then(res => {
+      console.log(res);
+    });
+  }
+
   render() {
-    const { loggedIn } = this.state;
+    const { loggedIn, loading } = this.state;
     return (
       <div className="App">
         <AppBar
-          title={<span>Protocol 5</span>}
+          title={<span style={{ color: 'white' }}>Protocol 5</span>}
           showMenuIconButton={false}
           iconElementRight={
             <div onClick={() => this.setState({ open: true })}>
@@ -75,7 +89,7 @@ class App extends Component {
           open={this.state.open}
           onRequestChange={open => this.setState({ open })}
         >
-          <Link to="/newChecklist">
+          <Link onClick={this.handleToggle} to="/newChecklist">
             <MenuItem primaryText="New Checklist" />
           </Link>
           <MenuItem primaryText="Refresh" onClick={this.handlePageRefresh} />
@@ -87,15 +101,15 @@ class App extends Component {
               width: '100%',
               borderTop: '1px solid white'
             }}
-            onClick={() => null}
+            onClick={() => this.logOut()}
             primaryText="Logout"
           />
         </Drawer>
         <Routes
-          updateUser={this.updateUser}
           login={login}
           loggedIn={loggedIn}
           auth={auth}
+          loading={loading}
         />
         <Paper style={{ overflow: 'hidden' }} zDepth={1}>
           <BottomNavigation
