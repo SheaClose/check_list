@@ -96,6 +96,16 @@ app.get('/api/checklists', (req, res) => {
     .then(checklists => res.status(200).json(checklists))
     .catch(err => console.log('Unable to fetch checklists: ', err));
 });
+app.post('/api/newChecklist', (req, res) => {
+  const { name: title, desc } = req.body;
+  req.app
+    .get('db')
+    .checklists.save({ title, desc, status: 'active' })
+    .then(checklist => {
+      res.status(200).json(checklist);
+    })
+    .catch(err => console.log('Unable to create new checklist: ', err));
+});
 
 app.listen(port, () => {
   // console.log('Server listening on port', port);

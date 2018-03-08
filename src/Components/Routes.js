@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import RaisedButton from 'material-ui/RaisedButton';
+
 // import Callback from './Callback';
 import Home from './Home';
+import NewChecklist from './NewChecklist/NewChecklist';
 // import './Routes.css';
 
 class Routes extends Component {
@@ -21,7 +23,7 @@ class Routes extends Component {
   }
   render() {
     const { loggedIn } = this.state;
-    const { loading, login, checklists } = this.props;
+    const { submitNewChecklist, loading, login, checklists, goTo } = this.props;
     return (
       <Switch>
         {/* Protected Routes */}
@@ -34,7 +36,13 @@ class Routes extends Component {
             />
             <Route
               path="/newChecklist"
-              render={() => <div>newChecklist</div>}
+              render={props => (
+                <NewChecklist
+                  submitNewChecklist={submitNewChecklist}
+                  {...props}
+                  goTo={goTo}
+                />
+              )}
             />
             <Route path="/previous" render={() => <div>previous</div>} />
             <Route path="/active" render={() => <div>active</div>} />
@@ -71,6 +79,8 @@ class Routes extends Component {
 Routes.propTypes = {
   loggedIn: PropTypes.bool,
   login: PropTypes.func,
+  goTo: PropTypes.func,
+  submitNewChecklist: PropTypes.func,
   loading: PropTypes.bool,
   checklists: PropTypes.array
 };
