@@ -10,7 +10,6 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import './index.css';
 
 import App from './App';
-import registerServiceWorker from './registerServiceWorker';
 
 ReactDOM.render(
   <MuiThemeProvider
@@ -22,7 +21,8 @@ ReactDOM.render(
         accent2Color: '#607d8b',
         accent3Color: '#b0bec5',
         borderColor: 'rgba(255, 255, 255, 0.54)',
-        canvasColor: '#37474f'
+        canvasColor: '#37474f',
+        disabledColor: 'rgba(255, 255, 255, 0.57)'
       }
     })}
   >
@@ -32,4 +32,3 @@ ReactDOM.render(
   </MuiThemeProvider>,
   document.getElementById('root')
 );
-registerServiceWorker();
