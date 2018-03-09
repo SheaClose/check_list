@@ -32,6 +32,7 @@ class NewChecklist extends Component {
           }}
         >
           <TextField
+            autoFocus
             onChange={e => this.handleInput('name', e.target.value)}
             hintText=""
             floatingLabelText="Checklist Name"
@@ -53,7 +54,7 @@ class NewChecklist extends Component {
             primary={true}
             style={{ margin: '0 10px' }}
           >
-            Forward
+            Submit
           </RaisedButton>
         </form>
       </Card>

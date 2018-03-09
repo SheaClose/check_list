@@ -17,7 +17,7 @@ ReactDOM.render(
       palette: {
         primary1Color: '#4db6ac',
         primary2Color: '#009688',
-        accent1Color: '#18ffff',
+        accent1Color: '#f5f5f5',
         accent2Color: '#607d8b',
         accent3Color: '#b0bec5',
         borderColor: 'rgba(255, 255, 255, 0.54)',

@@ -6,6 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 // import Callback from './Callback';
 import Home from './Home';
 import NewChecklist from './NewChecklist/NewChecklist';
+import ChecklistDisplay from './ChecklistDisplay/ChecklistDisplay';
 // import './Routes.css';
 
 class Routes extends Component {
@@ -23,7 +24,14 @@ class Routes extends Component {
   }
   render() {
     const { loggedIn } = this.state;
-    const { submitNewChecklist, loading, login, checklists, goTo } = this.props;
+    const {
+      submitNewChecklist,
+      loading,
+      login,
+      checklists,
+      goTo,
+      updateChecklist
+    } = this.props;
     return (
       <Switch>
         {/* Protected Routes */}
@@ -32,7 +40,14 @@ class Routes extends Component {
             <Route
               exact
               path="/"
-              render={props => <Home {...props} checklists={checklists} />}
+              render={props => (
+                <Home
+                  {...props}
+                  checklists={checklists}
+                  updateChecklist={updateChecklist}
+                  goTo={goTo}
+                />
+              )}
             />
             <Route
               path="/newChecklist"
@@ -43,6 +58,10 @@ class Routes extends Component {
                   goTo={goTo}
                 />
               )}
+            />
+            <Route
+              path="/checklist/:id"
+              render={props => <ChecklistDisplay {...props} />}
             />
             <Route path="/previous" render={() => <div>previous</div>} />
             <Route path="/active" render={() => <div>active</div>} />
@@ -82,7 +101,8 @@ Routes.propTypes = {
   goTo: PropTypes.func,
   submitNewChecklist: PropTypes.func,
   loading: PropTypes.bool,
-  checklists: PropTypes.array
+  checklists: PropTypes.array,
+  updateChecklist: PropTypes.func
 };
 
 export default withRouter(Routes);
