@@ -63,7 +63,7 @@ app.get(
           db
             .run(
               // eslint-disable-next-line
-              'insert into checklist_users (id, name, first_name, last_name, img_url) values (${id}, ${name}, ${first_name}, ${last_name}, ${img_url}); select * from checklist_users where id = ${id}',
+              'insert into checklist_users (id, name, first_name, last_name) values (${id}, ${name}, ${first_name}, ${last_name}); select * from checklist_users where id = ${id}',
               user
             )
             .then(newUser => {
@@ -92,7 +92,7 @@ app.get('/api/logout', (req, res) => {
 app.get('/api/checklists', (req, res) => {
   req.app
     .get('db')
-    .checklists.find()
+    .checklist_template.find()
     .then(checklists => res.status(200).json(checklists))
     .catch(err => console.log('Unable to fetch checklists: ', err));
 });
@@ -100,13 +100,41 @@ app.post('/api/newChecklist', (req, res) => {
   const { name: title, desc } = req.body;
   req.app
     .get('db')
-    .checklists.save({ title, desc, status: 'active' })
+    .checklist_template.save({ title, desc, status: 'active' })
     .then(checklist => {
       res.status(200).json(checklist);
     })
     .catch(err => console.log('Unable to create new checklist: ', err));
 });
-
+app.delete('/api/checklisttemplate/:id', (req, res) => {
+  const db = req.app.get('db');
+  const { id } = req.params;
+  db
+    .query(
+      'delete from checklists where id = $1; select * from checklists;',
+      id
+    )
+    .then(checklists => res.status(200).json(checklists))
+    .catch(err => res.status(500).json(err));
+});
+app.get('/api/checklist_item/:id', (req, res) => {
+  const db = req.app.get('db');
+  db
+    .getChecklistItemsByChecklistId(req.params.id)
+    .then(checklists => res.status(200).json(checklists))
+    .catch(err =>
+      console.log('Error getting checklist items by checklist id: ', err)
+    );
+});
+app.post('/api/checklist_item/:id', (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const db = req.app.get('db');
+  db
+    .createNewChecklistItem(name, id, req.session.user.id)
+    .then(checklist => res.status(200).json(checklist))
+    .catch(err => console.log('Error adding new checklist item: ', err));
+});
 app.listen(port, () => {
   // console.log('Server listening on port', port);
 });

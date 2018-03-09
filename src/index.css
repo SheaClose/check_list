@@ -1,6 +1,7 @@
 body {
   margin: 0;
   padding: 0;
+  padding-bottom: 56px;
   font-family: sans-serif;
   min-height: 100vh;
   background-color: rgba(158, 158, 158, 0.68);
@@ -11,4 +12,9 @@ body {
   margin: 20px;
   text-align: center;
   display: inline-block;
+}
+.addIcon {
+  position: absolute;
+  bottom: 85px;
+  right: 20px;
 }

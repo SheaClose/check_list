@@ -27,6 +27,7 @@ class App extends Component {
     this.logout = this.logout.bind(this);
     this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
     this.submitNewChecklist = this.submitNewChecklist.bind(this);
+    this.updateChecklist = this.updateChecklist.bind(this);
   }
 
   componentDidMount() {
@@ -79,6 +80,9 @@ class App extends Component {
       snackBarMessage
     });
   }
+  updateChecklist(checklists) {
+    this.setState({ checklists });
+  }
   render() {
     const { loggedIn, loading, checklists, selectedIndex } = this.state;
     return (
@@ -91,6 +95,7 @@ class App extends Component {
           loading={loading}
           goTo={this.goTo}
           submitNewChecklist={this.submitNewChecklist}
+          updateChecklist={this.updateChecklist}
         />
         <BottomNav selectedIndex={selectedIndex} select={this.select} />
 
