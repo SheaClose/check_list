@@ -3,11 +3,9 @@ import { Switch, Route, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import RaisedButton from 'material-ui/RaisedButton';
 
-// import Callback from './Callback';
 import Home from './Home';
 import NewChecklist from './NewChecklist/NewChecklist';
 import ChecklistDisplay from './ChecklistDisplay/ChecklistDisplay';
-// import './Routes.css';
 
 class Routes extends Component {
   constructor(props) {

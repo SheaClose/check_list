@@ -117,5 +117,6 @@ App.propTypes = {
 export default withRouter(App);
 
 function login() {
-  window.location.href = `${process.env.REACT_APP_HOST}/login`;
+  const { REACT_APP_HOST } = process.env;
+  window.location.href = `${REACT_APP_HOST || ''}/login`;
 }

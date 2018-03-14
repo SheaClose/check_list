@@ -12,6 +12,7 @@
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-3": "^6.24.1",
     "body-parser": "^1.18.2",
+    "bootstrap": "^4.0.0",
     "concurrently": "^3.5.0",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
@@ -45,7 +46,12 @@
       "concurrently --kill-others \"nodemon --watch server --inspect server/index.js\" \"react-scripts start\"",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "now --public --dotenv=.env.prod -d && now alias",
+    "now-start": "node server/index.js"
+  },
+  "now": {
+    "alias": "checklist-lh"
   },
   "proxy": "http://localhost:3001"
 }

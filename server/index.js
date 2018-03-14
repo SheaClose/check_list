@@ -1,13 +1,16 @@
 const express = require('express'),
   cors = require('cors'),
   bodyParser = require('body-parser'),
-  port = 3001,
+  port = process.env.PORT || 3001,
   app = express(),
   session = require('express-session'),
   massive = require('massive'),
   passport = require('passport'),
-  GoogleStrategy = require('passport-google-oauth20').Strategy;
-require('dotenv').config();
+  GoogleStrategy = require('passport-google-oauth20').Strategy,
+  path = require('path');
+require('dotenv').config({
+  path: './.env.prod'
+});
 
 massive(process.env.CONNECTION_STRING)
   .then(dbInstance => {
@@ -24,7 +27,6 @@ app.use(
 );
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/', express.static(__dirname));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -111,7 +113,7 @@ app.delete('/api/checklisttemplate/:id', (req, res) => {
   const { id } = req.params;
   db
     .query(
-      'delete from checklists where id = $1; select * from checklists;',
+      'delete from checklist_template where id = $1; select * from checklist_template;',
       id
     )
     .then(checklists => res.status(200).json(checklists))
@@ -135,6 +137,13 @@ app.post('/api/checklist_item/:id', (req, res) => {
     .then(checklist => res.status(200).json(checklist))
     .catch(err => console.log('Error adding new checklist item: ', err));
 });
+
+app.use(express.static(`${__dirname}/../build`));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build/index.html'));
+});
+
 app.listen(port, () => {
-  // console.log('Server listening on port', port);
+  console.log('Server listening on port', port);
 });
