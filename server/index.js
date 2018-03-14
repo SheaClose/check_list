@@ -70,12 +70,12 @@ app.get(
             )
             .then(newUser => {
               req.session.user = newUser[0];
-              return res.redirect(process.env.FRONT_END_URL);
+              return res.redirect(process.env.FRONT_END_URL || '/');
             })
             .catch(err => console.log('Unable to create new user: ', err));
         } else {
           req.session.user = existingUser[0];
-          res.redirect(process.env.FRONT_END_URL);
+          res.redirect(process.env.FRONT_END_URL || '/');
         }
       })
       .catch(err => console.log('Error retrieving user from database: ', err));
