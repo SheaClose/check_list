@@ -6,11 +6,10 @@ const express = require('express'),
   session = require('express-session'),
   massive = require('massive'),
   passport = require('passport'),
-  GoogleStrategy = require('passport-google-oauth20').Strategy,
-  path = require('path');
-require('dotenv').config({
-  path: './.env.prod'
-});
+  GoogleStrategy = require('passport-google-oauth20').Strategy;
+require('dotenv').config();
+
+app.use(express.static(`${__dirname}/../build`));
 
 massive(process.env.CONNECTION_STRING)
   .then(dbInstance => {
@@ -138,7 +137,7 @@ app.post('/api/checklist_item/:id', (req, res) => {
     .catch(err => console.log('Error adding new checklist item: ', err));
 });
 
-app.use(express.static(`${__dirname}/../build`));
+const path = require('path');
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../build/index.html'));
