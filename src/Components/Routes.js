@@ -6,6 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Home from './Home';
 import NewChecklist from './NewChecklist/NewChecklist';
 import ChecklistDisplay from './ChecklistDisplay/ChecklistDisplay';
+import EditChecklists from './EditChecklists';
 
 class Routes extends Component {
   constructor(props) {
@@ -28,7 +29,8 @@ class Routes extends Component {
       login,
       checklists,
       goTo,
-      updateChecklist
+      updateChecklist,
+      user
     } = this.props;
     return (
       <Switch>
@@ -48,6 +50,18 @@ class Routes extends Component {
               )}
             />
             <Route
+              exact
+              path="/edit"
+              render={props => (
+                <EditChecklists
+                  {...props}
+                  checklists={checklists}
+                  updateChecklist={updateChecklist}
+                  goTo={goTo}
+                />
+              )}
+            />
+            <Route
               path="/newChecklist"
               render={props => (
                 <NewChecklist
@@ -59,7 +73,7 @@ class Routes extends Component {
             />
             <Route
               path="/checklist/:id"
-              render={props => <ChecklistDisplay {...props} />}
+              render={props => <ChecklistDisplay {...props} user={user} />}
             />
             <Route path="/previous" render={() => <div>previous</div>} />
             <Route path="/active" render={() => <div>active</div>} />
@@ -100,7 +114,8 @@ Routes.propTypes = {
   submitNewChecklist: PropTypes.func,
   loading: PropTypes.bool,
   checklists: PropTypes.array,
-  updateChecklist: PropTypes.func
+  updateChecklist: PropTypes.func,
+  user: PropTypes.object
 };
 
 export default withRouter(Routes);

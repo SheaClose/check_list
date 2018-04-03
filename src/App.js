@@ -20,7 +20,8 @@ class App extends Component {
       loading: true,
       openSnackBar: false,
       snackBarMessage: '',
-      checklists: []
+      checklists: [],
+      user: {}
     };
     this.goTo = this.goTo.bind(this);
     this.select = this.select.bind(this);
@@ -84,7 +85,7 @@ class App extends Component {
     this.setState({ checklists });
   }
   render() {
-    const { loggedIn, loading, checklists, selectedIndex } = this.state;
+    const { loggedIn, loading, checklists, selectedIndex, user } = this.state;
     return (
       <div className="App">
         <Nav goTo={this.goTo} loggedIn={loggedIn} logout={this.logout} />
@@ -96,6 +97,7 @@ class App extends Component {
           goTo={this.goTo}
           submitNewChecklist={this.submitNewChecklist}
           updateChecklist={this.updateChecklist}
+          user={user}
         />
         <BottomNav selectedIndex={selectedIndex} select={this.select} />
 

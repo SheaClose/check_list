@@ -9,7 +9,7 @@ const express = require('express'),
   GoogleStrategy = require('passport-google-oauth20').Strategy,
   path = require('path');
 require('dotenv').config({
-  path: './.env.prod'
+  path: `./.env${process.env.NODE_ENV === 'production' ? '.prod' : ''}`
 });
 
 massive(process.env.CONNECTION_STRING)
@@ -136,6 +136,23 @@ app.post('/api/checklist_item/:id', (req, res) => {
     .createNewChecklistItem(name, id, req.session.user.id)
     .then(checklist => res.status(200).json(checklist))
     .catch(err => console.log('Error adding new checklist item: ', err));
+});
+app.put('/api/toggle_checklist_item/:id', (req, res) => {
+  const db = req.app.get('db');
+  db.checklist_items
+    .update({
+      id: req.params.id,
+      ...req.body.checklist
+    })
+    .then(() => {
+      db
+        .getChecklistItemsByChecklistId(req.body.checklistId)
+        .then(checklists => res.status(200).json(checklists))
+        .catch(err =>
+          console.log('Error getting checklist items by checklist id: ', err)
+        );
+    })
+    .catch(console.log);
 });
 
 app.use(express.static(`${__dirname}/../build`));

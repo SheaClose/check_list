@@ -7,70 +7,57 @@ import Subheader from 'material-ui/Subheader';
 import Toggle from 'material-ui/Toggle';
 import Divider from 'material-ui/Divider';
 import Paper from 'material-ui/Paper';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import Dialog from 'material-ui/Dialog';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
 
-const customContentStyle = {
-  width: '90%',
-  maxWidth: 'none'
-};
 // import './ChecklistDisplay.css';
 
 class ChecklistDisplay extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      checklistItems: [],
-      openDialog: false,
-      name: ''
+      checklistItems: []
     };
-    this.handleOpen = this.handleOpen.bind(this);
-    this.handleClose = this.handleClose.bind(this);
-    this.addItemToChecklist = this.addItemToChecklist.bind(this);
+    this.listItemToggle = this.listItemToggle.bind(this);
   }
   componentDidMount() {
     axios
       .get(`/api/checklist_item/${this.props.match.params.id}`)
-      .then(({ data: checklistItems }) => this.setState({ checklistItems }));
-  }
-  handleOpen() {
-    this.setState({ openDialog: true });
-  }
-
-  handleClose() {
-    this.setState({ openDialog: false });
-  }
-  addItemToChecklist() {
-    const { name } = this.state;
-    axios
-      .post(`/api/checklist_item/${this.props.match.params.id}`, { name })
       .then(({ data: checklistItems }) => {
-        this.setState({ checklistItems, openDialog: false });
+        this.setState({ checklistItems });
+      });
+  }
+  listItemToggle(checklist) {
+    const { complete, id } = checklist;
+    axios
+      .put(`/api/toggle_checklist_item/${id}`, {
+        checklist: {
+          complete: !complete,
+          completed_by: complete ? null : this.props.user.id,
+          completion_date: complete ? null : Date.now()
+        },
+        checklistId: this.props.match.params.id
+      })
+      .then(res => {
+        this.setState({ checklistItems: res.data });
       })
       .catch(console.log);
   }
   render() {
-    const actions = [
-      <RaisedButton
-        style={{ margin: '0 5px' }}
-        label="Cancel"
-        primary={true}
-        onClick={this.handleClose}
-      />,
-      <RaisedButton style={{ margin: '0 5px' }} label="Submit" primary={true} />
-    ];
-    const listItems = this.state.checklistItems.map(item => (
-      <div key={item.id}>
-        <ListItem
-          primaryText={item.name}
-          rightToggle={<Toggle defaultToggled={item.complete} />}
-        />
-        <Divider />
-      </div>
-    ));
+    const listItems = this.state.checklistItems
+      .sort((a, b) => a.id > b.id)
+      .map(item => (
+        <div key={item.id}>
+          <ListItem
+            primaryText={item.name}
+            rightToggle={
+              <Toggle
+                onClick={() => this.listItemToggle(item)}
+                defaultToggled={item.complete}
+              />
+            }
+          />
+          <Divider />
+        </div>
+      ));
     return (
       <div>
         <Paper className="paperStyle" zDepth={3}>
@@ -83,41 +70,14 @@ class ChecklistDisplay extends Component {
             {listItems}
           </List>
         </Paper>
-        <FloatingActionButton
-          onClick={this.handleOpen}
-          className="addIcon"
-          zDepth={3}
-        >
-          <ContentAdd />
-        </FloatingActionButton>
-
-        <Dialog
-          title="New Item"
-          actions={actions}
-          modal={true}
-          contentStyle={customContentStyle}
-          open={this.state.openDialog}
-        >
-          <form
-            onSubmit={e => {
-              e.preventDefault();
-              this.addItemToChecklist();
-            }}
-          >
-            <TextField
-              autoFocus
-              onChange={e => this.setState({ name: e.target.value })}
-              floatingLabelText="Add item to checklist"
-            />
-          </form>
-        </Dialog>
       </div>
     );
   }
 }
 
 ChecklistDisplay.propTypes = {
-  match: PropTypes.object
+  match: PropTypes.object,
+  user: PropTypes.object
 };
 
 export default ChecklistDisplay;
