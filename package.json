@@ -16,12 +16,8 @@
     "concurrently": "^3.5.0",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
-    "eslint": "^4.13.1",
     "eslint-config-airbnb": "^15.0.2",
     "eslint-config-airbnb-base": "^11.2.0",
-    "eslint-plugin-import": "^2.6.1",
-    "eslint-plugin-jsx-a11y": "^5.1.1",
-    "eslint-plugin-react": "^7.5.1",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "global": "^4.3.2",
@@ -39,11 +35,17 @@
     "react-router-dom": "^4.2.2"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint": "^4.19.1",
+    "eslint-config-react-app": "^2.1.0",
+    "eslint-plugin-flowtype": "^2.46.1",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.7.0",
     "react-scripts": "1.1.1"
   },
   "scripts": {
-    "start":
-      "concurrently --kill-others \"nodemon --watch server --inspect server/index.js\" \"react-scripts start\"",
+    "start": "concurrently --kill-others \"nodemon --watch server --inspect server/index.js\" \"react-scripts start\"",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",

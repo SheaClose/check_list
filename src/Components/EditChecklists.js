@@ -16,25 +16,22 @@ class EditChecklists extends Component {
       openDialog: false,
       selectedChecklistToDel: 0
     };
-    this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this);
-    this.handleClose = this.handleClose.bind(this);
-    this.deleteChecklistItem = this.deleteChecklistItem.bind(this);
   }
-  handleDeleteButtonClick(selectedChecklistToDel) {
+  handleDeleteButtonClick = selectedChecklistToDel => {
     this.setState({ openDialog: true, selectedChecklistToDel });
-  }
-  handleClose() {
+  };
+  handleClose = () => {
     this.setState({ openDialog: false });
-  }
-  deleteChecklistItem() {
+  };
+  deleteChecklistItem = () => {
     axios
       .delete(`/api/checklisttemplate/${this.state.selectedChecklistToDel}`)
-      .then(checklists => {
-        this.props.updateChecklist(checklists.data);
+      .then(({ data: checklists }) => {
+        this.props.updateChecklist(checklists);
         this.handleClose();
       })
       .catch(console.log);
-  }
+  };
   render() {
     const { checklists = [] } = this.props;
     const actions = [
@@ -51,15 +48,15 @@ class EditChecklists extends Component {
         zDepth={4}
         className="paperStyle"
         onClick={e =>
-          (e.target.localName !== 'svg' && e.target.localName !== 'path'
-            ? this.props.goTo(`/checklist/${checkList.id}`)
-            : null)
+          e.target.localName !== 'svg' && e.target.localName !== 'path'
+            ? this.props.goTo(`/edit_checklist/${checkList.id}`)
+            : null
         }
         key={checkList.id}
       >
         <CardHeader
           textStyle={{ paddingRight: 0 }}
-          title={checkList.title}
+          title={checkList.name}
           actAsExpander={true}
         >
           <Delete

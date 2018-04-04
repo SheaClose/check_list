@@ -23,12 +23,6 @@ class App extends Component {
       checklists: [],
       user: {}
     };
-    this.goTo = this.goTo.bind(this);
-    this.select = this.select.bind(this);
-    this.logout = this.logout.bind(this);
-    this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
-    this.submitNewChecklist = this.submitNewChecklist.bind(this);
-    this.updateChecklist = this.updateChecklist.bind(this);
   }
 
   componentDidMount() {
@@ -39,51 +33,53 @@ class App extends Component {
       this.setState({ loading: false });
     });
     axios
-      .get('/api/checklists')
+      .get('/api/checklist_templates')
       .then(({ data: checklists }) => {
+        console.log('checklists: ', checklists);
         this.setState({ checklists });
       })
       .catch(console.log);
   }
-  submitNewChecklist(name, desc) {
+  submitNewChecklist = doc => {
     axios
-      .post('/api/newChecklist', { name, desc })
+      .post('/api/checklist_template', doc)
       .then(({ data }) => {
+        console.log('data: ', data);
         this.setState({ checklists: [...this.state.checklists, data] });
         this.goTo('/');
       })
       .catch(console.log);
-  }
+  };
 
-  select(index, path) {
+  select = (index, path) => {
     this.setState({ selectedIndex: index });
     this.goTo(path);
-  }
+  };
 
-  goTo(path) {
+  goTo = path => {
     this.props.history.push(path);
-  }
-  logout() {
+  };
+  logout = () => {
     this.setState({ loggedIn: false, user: null });
     axios.get('/api/logout').then(() => {
       this.handleSnackBarOpen('Thank you, come again!');
     });
-  }
-  handleSnackBarClose() {
+  };
+  handleSnackBarClose = () => {
     this.setState({
       openSnackBar: false,
       snackBarMessage: ''
     });
-  }
-  handleSnackBarOpen(snackBarMessage) {
+  };
+  handleSnackBarOpen = snackBarMessage => {
     this.setState({
       openSnackBar: true,
       snackBarMessage
     });
-  }
-  updateChecklist(checklists) {
+  };
+  updateChecklist = checklists => {
     this.setState({ checklists });
-  }
+  };
   render() {
     const { loggedIn, loading, checklists, selectedIndex, user } = this.state;
     return (

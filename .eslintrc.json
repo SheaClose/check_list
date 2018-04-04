@@ -3,7 +3,7 @@
     "browser": true,
     "es6": true
   },
-  "extends": "airbnb",
+  "extends": "react-app",
   "parserOptions": {
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true,
@@ -13,7 +13,7 @@
     "sourceType": "module",
     "experimentalDecorators": true
   },
-  "plugins": ["react", "import"],
+  "plugins": ["jsx-a11y"],
   "rules": {
     "require-jsdoc": 0,
     "valid-jsdoc": 0,

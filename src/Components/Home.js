@@ -11,15 +11,15 @@ class Home extends Component {
         zDepth={4}
         className="paperStyle"
         onClick={e =>
-          (e.target.localName !== 'svg' && e.target.localName !== 'path'
+          e.target.localName !== 'svg' && e.target.localName !== 'path'
             ? this.props.goTo(`/checklist/${checkList.id}`)
-            : null)
+            : null
         }
         key={checkList.id}
       >
         <CardHeader
           textStyle={{ paddingRight: 0 }}
-          title={checkList.title}
+          title={checkList.name}
           actAsExpander={true}
         />
         <CardText>{checkList.desc}</CardText>

@@ -51,6 +51,13 @@ class Nav extends Component {
             }}
             primaryText="New Checklist"
           />
+          <MenuItem
+            onClick={() => {
+              goTo('/edit');
+              this.handleToggle();
+            }}
+            primaryText="Edit Checklists"
+          />
           <MenuItem primaryText="Refresh" onClick={this.handlePageRefresh} />
           <MenuItem
             style={{

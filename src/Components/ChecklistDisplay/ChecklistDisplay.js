@@ -26,20 +26,21 @@ class ChecklistDisplay extends Component {
       });
   }
   listItemToggle(checklist) {
-    const { complete, id } = checklist;
-    axios
-      .put(`/api/toggle_checklist_item/${id}`, {
-        checklist: {
-          complete: !complete,
-          completed_by: complete ? null : this.props.user.id,
-          completion_date: complete ? null : Date.now()
-        },
-        checklistId: this.props.match.params.id
-      })
-      .then(res => {
-        this.setState({ checklistItems: res.data });
-      })
-      .catch(console.log);
+    // const { complete, id } = checklist;
+    alert('fix this later!');
+    // axios
+    //   .put(`/api/toggle_checklist_item/${id}`, {
+    //     checklist: {
+    //       complete: !complete,
+    //       completed_by: complete ? null : this.props.user.id,
+    //       completion_date: complete ? null : Date.now()
+    //     },
+    //     checklistId: this.props.match.params.id
+    //   })
+    //   .then(res => {
+    //     this.setState({ checklistItems: res.data });
+    //   })
+    //   .catch(console.log);
   }
   render() {
     const listItems = this.state.checklistItems

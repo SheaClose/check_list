@@ -3,8 +3,7 @@ import TextField from 'material-ui/TextField';
 import { Card } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import PropTypes from 'prop-types';
-// import axios from 'axios';
-// import './NewChecklist.css';
+
 const cardStyle = { minHeight: '40vh' };
 class NewChecklist extends Component {
   constructor(props) {
@@ -28,7 +27,8 @@ class NewChecklist extends Component {
         <form
           onSubmit={e => {
             e.preventDefault();
-            submitNewChecklist(name, desc);
+            submitNewChecklist({ name, desc });
+            // this.saveDoc({ name, desc });
           }}
         >
           <TextField

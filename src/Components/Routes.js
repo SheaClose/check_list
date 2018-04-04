@@ -7,6 +7,7 @@ import Home from './Home';
 import NewChecklist from './NewChecklist/NewChecklist';
 import ChecklistDisplay from './ChecklistDisplay/ChecklistDisplay';
 import EditChecklists from './EditChecklists';
+import EditChecklist from './EditChecklist';
 
 class Routes extends Component {
   constructor(props) {
@@ -61,6 +62,22 @@ class Routes extends Component {
                 />
               )}
             />
+            <Route
+              exact
+              path="/edit_checklist/:id"
+              render={props => {
+                console.log('props: ', props);
+                return (
+                  <EditChecklist
+                    {...props}
+                    checklists={checklists}
+                    updateChecklist={updateChecklist}
+                    goTo={goTo}
+                  />
+                );
+              }}
+            />
+
             <Route
               path="/newChecklist"
               render={props => (

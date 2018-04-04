@@ -16,7 +16,7 @@ massive(process.env.CONNECTION_STRING)
   .then(dbInstance => {
     app.set('db', dbInstance);
   })
-  .catch(console.log);
+  .catch(err => console.log('Unable to connect to Db: ', err));
 
 app.use(
   session({
@@ -108,17 +108,17 @@ app.post('/api/newChecklist', (req, res) => {
     })
     .catch(err => console.log('Unable to create new checklist: ', err));
 });
-app.delete('/api/checklisttemplate/:id', (req, res) => {
-  const db = req.app.get('db');
-  const { id } = req.params;
-  db
-    .query(
-      'delete from checklist_template where id = $1; select * from checklist_template;',
-      id
-    )
-    .then(checklists => res.status(200).json(checklists))
-    .catch(err => res.status(500).json(err));
-});
+// app.delete('/api/checklisttemplate/:id', (req, res) => {
+//   const db = req.app.get('db');
+//   const { id } = req.params;
+//   db
+//     .query(
+//       'delete from checklist_template where id = $1; select * from checklist_template;',
+//       id
+//     )
+//     .then(checklists => res.status(200).json(checklists))
+//     .catch(err => res.status(500).json(err));
+// });
 app.get('/api/checklist_item/:id', (req, res) => {
   const db = req.app.get('db');
   db
@@ -152,8 +152,51 @@ app.put('/api/toggle_checklist_item/:id', (req, res) => {
           console.log('Error getting checklist items by checklist id: ', err)
         );
     })
-    .catch(console.log);
+    .catch(err => console.log(`Error updating checklist_items: ${err}`));
 });
+
+/////////// New templates ///////////////
+app
+  .get('/api/checklist_templates', (req, res) => {
+    const db = req.app.get('db');
+    db.checklist_templates
+      .findDoc({ created_by: req.user.id })
+      .then(checklists => res.status(200).json(checklists))
+      .catch(err => console.log(`Error getting checklist templates: ${err}`));
+  })
+  .get('/api/checklist_templates/:id', (req, res) => {
+    console.log(res);
+  })
+  .post('/api/checklist_template', (req, res) => {
+    const db = req.app.get('db');
+    db
+      .saveDoc('checklist_templates', {
+        ...req.body,
+        list_items: [],
+        created_by: req.user.id
+      })
+      .then(template => {
+        res.status(200).json(template);
+      })
+      .catch(err =>
+        console.log(`Error creating new checklist_template: ${err}`)
+      );
+  })
+  .delete('/api/checklisttemplate/:id', (req, res) => {
+    const db = req.app.get('db');
+    const { id } = req.params;
+    db
+      .query('delete from checklist_templates where id = $1;', id)
+      .then(() =>
+        db.checklist_templates
+          .findDoc({ created_by: req.user.id })
+          .then(checklists => res.status(200).json(checklists))
+          .catch(err =>
+            console.log(`Error getting checklist templates: ${err}`)
+          )
+      )
+      .catch(err => res.status(500).json(err));
+  });
 
 app.use(express.static(`${__dirname}/../build`));
 
